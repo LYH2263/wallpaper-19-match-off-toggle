@@ -39,4 +39,7 @@ def init_db():
         )
         conn.execute("INSERT INTO settings(key,value) VALUES ('unit','roll')")
         conn.commit()
+    # 对花默认开关：新库老库都补齐，已有值不覆盖
+    conn.execute("INSERT OR IGNORE INTO settings(key,value) VALUES ('match_pattern_default','1')")
+    conn.commit()
     conn.close()
