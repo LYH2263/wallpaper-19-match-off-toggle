@@ -6,3 +6,4 @@ class EstimateRequest(BaseModel):
     roll_id: int
     save: bool = False
     note: str = ""
+    match_pattern: bool | None = None

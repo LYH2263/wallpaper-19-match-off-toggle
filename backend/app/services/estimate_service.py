@@ -1,10 +1,11 @@
 from fastapi import HTTPException
 
 from app.engines.wallpaper_math import roll_count
-from app.repositories import history, rolls, walls
+from app.modules import pattern_match
+from app.repositories import history, rolls, settings_repo, walls
 
 
-def run_estimate(wall_id: int, roll_id: int, save: bool, note: str):
+def run_estimate(wall_id: int, roll_id: int, save: bool, note: str, match_pattern=None):
     wall = walls.get_wall(wall_id)
     if not wall:
         raise HTTPException(404, "wall not found")
@@ -14,8 +15,9 @@ def run_estimate(wall_id: int, roll_id: int, save: bool, note: str):
     if wall.get("data_quality") == "dirty" or roll.get("data_quality") == "dirty":
         raise HTTPException(422, "dirty seed entity")
 
+    resolved = pattern_match.resolve_match_pattern(match_pattern, settings_repo.get_all())
     calc = roll_count(
-        wall["perimeter"], wall["height"], roll["width"], roll["length"], roll["pattern_cm"]
+        wall["perimeter"], wall["height"], roll["width"], roll["length"], roll["pattern_cm"], resolved
     )
     run_id = None
     if save:
